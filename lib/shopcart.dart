@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:event_bus/event_bus.dart';
-import 'package:flutter_app/main.dart';
+import 'package:flutter_app/eventbusutil.dart';
 
 class Production{
   String price;
@@ -44,7 +43,7 @@ class ShopItem extends StatelessWidget with util{
       },
       leading: new CircleAvatar(
         backgroundColor: _getColor(context,inCart),
-        child: Icon(Icons.ac_unit),
+        child: Icon(Icons.tablet_android),
       ),
       trailing: new Icon(inCart?Icons.check:Icons.add),
       title: new ItemLayout(p,inCart),
@@ -61,7 +60,10 @@ class ItemLayout extends StatelessWidget with util{
   Widget build(BuildContext context) {
     return Row(
         children:<Widget>[
-          Text("名称:"+p.name, style: inCart?Theme.of(context).textTheme.title:Theme.of(context).textTheme.subtitle),
+          new Padding(
+            padding: const EdgeInsets.all(8.0),
+            child:  Text("名称:"+p.name, style: inCart?Theme.of(context).textTheme.title:Theme.of(context).textTheme.subtitle),
+          ),
           Text("价格:"+p.price, style: _getTextStyle(context,inCart)),
         ]
     );
@@ -79,13 +81,12 @@ class MyListView extends StatefulWidget {
 
 class ShopList extends State<MyListView> {
   Set<Production> _shoppingCart=new Set();
-  EventBus eventBus = new EventBus();
 
   @override
   void initState() {
     super.initState();
     eventBus.on<ClearAllEvent>().listen((event) {
-      print(event.flag);
+      print("ClearAllEvent:"+(event.flag?"true":"false"));
       if(event.flag){
         _clear();
       }

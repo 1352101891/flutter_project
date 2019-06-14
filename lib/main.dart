@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_app/eventbusutil.dart';
 import 'package:flutter_app/shopcart.dart';
 import 'package:event_bus/event_bus.dart';
 
 void main() => runApp(MyApp());
 
-class ClearAllEvent{
-  bool flag;
-  ClearAllEvent(this.flag);
-}
 
 class MyApp extends StatelessWidget {
   // This widget is the root of your application.
@@ -59,7 +56,7 @@ class _MyHomePageState extends State<MyHomePage> {
   new Production(name:"百事可乐",price:"2.5￥"),
   new Production(name:"可口可乐",price:"2.5￥"),
   ];
-  EventBus eventBus = new EventBus();
+
 
   void _clearAll() {
     eventBus.fire(new ClearAllEvent(true));
