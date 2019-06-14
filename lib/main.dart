@@ -72,9 +72,29 @@ class _MyHomePageState extends State<MyHomePage> {
     // than having to individually change instances of widgets.
     return Scaffold(
       appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
+        leading:IconButton(
+          icon: Icon(Icons.arrow_back_ios),
+          tooltip: 'Air it',
+          onPressed: null,
+        ),
+        title: Text('My Fancy Dress'),
+        actions: <Widget>[
+          IconButton(
+            icon: Icon(Icons.playlist_play),
+            tooltip: 'Air it',
+            onPressed: null,
+          ),
+          IconButton(
+            icon: Icon(Icons.playlist_add),
+            tooltip: 'Restitch it',
+            onPressed: null,
+          ),
+          IconButton(
+            icon: Icon(Icons.playlist_add_check),
+            tooltip: 'Repair it',
+            onPressed: null,
+          ),
+        ],
       ),
       body: Center(
         // Center is a layout widget. It takes a single child and positions it
