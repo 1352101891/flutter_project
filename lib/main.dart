@@ -46,18 +46,16 @@ class MyHomePage extends StatefulWidget {
   @override
   _MyHomePageState createState() => _MyHomePageState();
 }
+List<Production> prods=<Production>[
+  new Production(name:"哇哈哈",price:"2￥",icon:Icons.ac_unit),
+  new Production(name:"加多宝",price:"5￥",icon:Icons.accessibility),
+  new Production(name:"七喜",price:"3￥",icon:Icons.account_balance),
+  new Production(name:"芬达",price:"3￥",icon:Icons.accessible),
+  new Production(name:"百事可乐",price:"2.5￥",icon:Icons.access_time),
+  new Production(name:"可口可乐",price:"2.5￥",icon:Icons.add_to_queue),
+];
 
 class _MyHomePageState extends State<MyHomePage> {
-  List<Production> prods=<Production>[
-  new Production(name:"哇哈哈",price:"2￥"),
-  new Production(name:"加多宝",price:"5￥"),
-  new Production(name:"七喜",price:"3￥"),
-  new Production(name:"芬达",price:"3￥"),
-  new Production(name:"百事可乐",price:"2.5￥"),
-  new Production(name:"可口可乐",price:"2.5￥"),
-  ];
-
-
   void _clearAll() {
     eventBus.fire(new ClearAllEvent(true));
   }

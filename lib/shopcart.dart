@@ -5,7 +5,8 @@ import 'package:flutter_app/eventbusutil.dart';
 class Production{
   String price;
   String name;
-  Production({this.price, this.name});
+  IconData icon;
+  Production({this.icon,this.price, this.name});
 }
 
 class util{
