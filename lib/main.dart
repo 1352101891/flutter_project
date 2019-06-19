@@ -3,10 +3,10 @@ import 'package:flutter_app/eventbusutil.dart';
 import 'package:flutter_app/shopcart.dart';
 import 'package:event_bus/event_bus.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(mainApp());
 
 
-class MyApp extends StatelessWidget {
+class mainApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {

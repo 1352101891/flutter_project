@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/bottomdragwidget.dart';
 
-void main() => runApp(MyApp());
+void main() => runApp(animationApp());
 
 
-class MyApp extends StatelessWidget {
+class animationApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
@@ -22,13 +22,13 @@ class MyApp extends StatelessWidget {
         // is not restarted.
         primarySwatch: Colors.blue,
       ),
-      home: MyHomePage(title: 'Flutter Demo Home Page'),
+      home: animationHomePage(title: 'Flutter Demo Home Page'),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  MyHomePage({Key key, this.title}) : super(key: key);
+class animationHomePage extends StatefulWidget {
+  animationHomePage({Key key, this.title}) : super(key: key);
 
   // This widget is the home page of your application. It is stateful, meaning
   // that it has a State object (defined below) that contains fields that affect
@@ -45,11 +45,12 @@ class MyHomePage extends StatefulWidget {
   _MyHomePageState createState() => _MyHomePageState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
+class _MyHomePageState extends State<animationHomePage> with AutomaticKeepAliveClientMixin{
 
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     // This method is rerun every time setState is called, for instance as done
     // by the _incrementCounter method above.
     //
@@ -57,11 +58,6 @@ class _MyHomePageState extends State<MyHomePage> {
     // fast, so that you can just rebuild anything that needs updating rather
     // than having to individually change instances of widgets.
     return Scaffold(
-      appBar: AppBar(
-        // Here we take the value from the MyHomePage object that was created by
-        // the App.build method, and use it to set our appbar title.
-        title: Text(widget.title),
-      ),
       body: Center(
           child:Align(
             alignment: Alignment.bottomCenter,
@@ -70,7 +66,8 @@ class _MyHomePageState extends State<MyHomePage> {
       )
     );
   }
-
+  @protected
+  bool get wantKeepAlive=>true;
 }
 
 class dragWidget extends StatefulWidget{
@@ -87,7 +84,7 @@ class _dragStateFul extends State<dragWidget> with TickerProviderStateMixin{
   double downThresold=100;
   bool isFinished=false;
   double startPositiony;
-  int duratime=500;
+  int duratime=200;
 
   _dragStateFul(){
      startPositiony=offsetDistance;

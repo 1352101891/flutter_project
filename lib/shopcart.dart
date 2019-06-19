@@ -80,7 +80,7 @@ class MyListView extends StatefulWidget {
   ShopList createState() => ShopList();
 }
 
-class ShopList extends State<MyListView> {
+class ShopList extends State<MyListView> with AutomaticKeepAliveClientMixin {
   Set<Production> _shoppingCart=new Set();
 
   @override
@@ -93,6 +93,9 @@ class ShopList extends State<MyListView> {
       }
     });
   }
+
+  @protected
+  bool get wantKeepAlive=>true;
 
   void _clear(){
     setState(() {
@@ -122,6 +125,7 @@ class ShopList extends State<MyListView> {
 
   @override
   Widget build(BuildContext context) {
+    super.build(context);
     return Scaffold(
       body: new ListView(
         padding: new EdgeInsets.symmetric(vertical: 8.0),
