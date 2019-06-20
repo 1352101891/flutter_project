@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/bottomdragwidget.dart';
 
+import 'main.dart';
+import 'widget/dragContainer.dart';
+
 void main() => runApp(animationApp());
 
 
@@ -61,127 +64,38 @@ class _MyHomePageState extends State<animationHomePage> with AutomaticKeepAliveC
       body: Center(
           child:Align(
             alignment: Alignment.bottomCenter,
-            child: dragWidget(),
+            child: dragWidget(
+              child:ListView(
+                children: <Widget>[]..addAll(prods.map((f)=>
+                    ListTile(
+                      onTap:()=>showTip(context,f.name),
+                      title: Text(f.name),
+                      subtitle: Text(f.price),
+                      leading: new CircleAvatar(
+                        child: Icon(f.icon),
+                      ),
+                      trailing: new Icon(Icons.add),
+                    )).toList()),
+              )
+            )
           ),
       )
     );
   }
-  @protected
-  bool get wantKeepAlive=>true;
-}
-
-class dragWidget extends StatefulWidget{
-
-  @override
-  _dragStateFul createState() => _dragStateFul();
-}
-
-class _dragStateFul extends State<dragWidget> with TickerProviderStateMixin{
-  double offsetDistance = 350.0;
-  double destinationy=0;
-  double dragHeight=400;
-  double upThresold=300;
-  double downThresold=100;
-  bool isFinished=false;
-  double startPositiony;
-  int duratime=200;
-
-  _dragStateFul(){
-     startPositiony=offsetDistance;
-  }
-
-  void animateUpdate(double update){
-    setState(() {
-      offsetDistance = update;
+  void showTip(BuildContext context,String name){
+     showModalBottomSheet(
+        context: context,
+        builder: (BuildContext context) {
+          return new Container(
+            height: 100.0,
+            child: new Text("你点击了："+name),
+          );
+        }).then((val) {
+      print(val);
     });
   }
- 
-
-  @override
-  Widget build(BuildContext context) {
-    // TODO: implement build
-    return Transform.translate(
-            offset: Offset(0,offsetDistance),
-            child:GestureDetector(
-              onVerticalDragStart: _start,
-              onVerticalDragEnd: _end,
-              onVerticalDragUpdate: _update,
-              child: Container(
-                padding: EdgeInsets.all(10),
-                width: double.infinity,
-                height: dragHeight,
-                child: Text("拖拽我"),
-                decoration: BoxDecoration(
-                  borderRadius: BorderRadius.circular(5),
-                  gradient: LinearGradient(colors: [Colors.blue, Colors.purple]),
-                ),
-              )
-          ),
-        );
-  }
-
-  void _start(DragStartDetails details){
-    print("手指按下："+details.globalPosition.dx.toString()+",isFinished"+isFinished.toString());
-  }
-
-  void _end(DragEndDetails details){
-    print("手指抬起：");
-    if(isUp){
-      if(offsetDistance<upThresold){
-        toPosition(y:destinationy);
-      }else{
-        toPosition(y:startPositiony);
-      }
-    }else{
-      if(offsetDistance>downThresold){
-        toPosition(y:startPositiony);
-      }else{
-        toPosition(y:destinationy);
-      }
-    }
-  }
-
-  void toPosition({double x,double y}){
-    double currentY=offsetDistance;
-    AnimationController controller=new AnimationController(vsync: this,duration:Duration(milliseconds:duratime));
-    CurvedAnimation curvedAnimation=new CurvedAnimation(parent: controller, curve: Curves.easeIn);
-    Animation<double> animation=new Tween(begin:currentY,end:y).animate(curvedAnimation);
-    animation.addListener(()=>{animateUpdate(animation.value)});
-    animation.addStatusListener(stateListener);
-    controller.forward();
-  }
-
-  void stateListener(AnimationStatus status){
-    if(status==AnimationStatus.completed){
-      isFinished=true;
-    }else{
-      isFinished=false;
-    }
-  }
-
-  bool isUp=true;
-  void _update(DragUpdateDetails details){
-
-    offsetDistance=offsetDistance+details.delta.dy;
-    if(offsetDistance<destinationy){
-      offsetDistance=destinationy;
-      setState(() { });
-      return;
-    }
-    if(offsetDistance>startPositiony){
-      offsetDistance=startPositiony;
-      setState(() { });
-      return;
-    }
-
-    setState(() { });
-    print("正在滑动："+details.delta.dy.toString());
-    if(details.delta.dy<0){
-      isUp=true;
-    }else{
-      isUp=false;
-    }
-  }
 
 
+  @protected
+  bool get wantKeepAlive=>true;
 }

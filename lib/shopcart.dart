@@ -128,6 +128,8 @@ class ShopList extends State<MyListView> with AutomaticKeepAliveClientMixin {
     super.build(context);
     return Scaffold(
       body: new ListView(
+        //不管什么平台这样设置,对于overscroll都可以监听到
+        physics: const ClampingScrollPhysics(),
         padding: new EdgeInsets.symmetric(vertical: 8.0),
         children: widget.productions.map((p)=>
             ShopItem(_shoppingCart.contains(p),p,_clickItem)
