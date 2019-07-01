@@ -44,6 +44,7 @@ flutter:
   # the material Icons class.
   uses-material-design: true
   assets:
+    - images/loading.png
     - images/timg.jpg
     - images/2.0x/timg.jpg
     - images/3.0x/timg.jpg

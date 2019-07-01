@@ -1,24 +1,29 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 
-class dragWidget extends StatefulWidget{
+import 'LoadingWidget.dart';
+
+class FreshContainer extends StatefulWidget{
   Widget child;
-  dragWidget({this.child});
+  Refresh callback;
+  FreshContainer({this.child,this.callback});
 
   @override
   _dragStateFul createState() => _dragStateFul();
 }
 
-class _dragStateFul extends State<dragWidget> with TickerProviderStateMixin{
-  double offsetDistance =380.0;
-  double destinationy=0;
-  double dragHeight=400;
-  double upThresold=300;
-  double downThresold=100;
-  bool isFinished=false;
+class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
+  double offsetDistance =-50;
+  double destinationy=50;
+  double Maxy=70;
+  double thresold=35;
+  bool isFinished=true;
   double startPositiony;
   int duratime=200;
-  bool isClosed=true;
+  STATUS loadingStatus=STATUS.IDLE;
+  bool isUp=true;
+  double angle=0;
+  int ratio=3; //从起点到终点，一共转几圈
 
   _dragStateFul(){
     startPositiony=offsetDistance;
@@ -34,23 +39,24 @@ class _dragStateFul extends State<dragWidget> with TickerProviderStateMixin{
   @override
   Widget build(BuildContext context) {
     // TODO: implement build
-    return Transform.translate(
-      offset: Offset(0,offsetDistance),
-      child:GestureDetector(
-          onVerticalDragStart: _start,
-          onVerticalDragEnd: _end,
-          onVerticalDragUpdate: _update,
-          child:  Container(
-              padding: EdgeInsets.fromLTRB(0,20,0,0),
+    return Stack(
+        alignment:  Alignment.topCenter,
+        children: [
+          GestureDetector(
+            onVerticalDragStart: _start,
+            onVerticalDragEnd: _end,
+            onVerticalDragUpdate: _update,
+            child:  Container(
+              padding: EdgeInsets.fromLTRB(0,10,0,0),
               width: double.infinity,
-              height: dragHeight,
+              height: double.infinity,
               child:NotificationListener<ScrollEndNotification>(
                 child:NotificationListener<ScrollUpdateNotification>(
                   child: NotificationListener<OverscrollNotification>(
                     child: NotificationListener<ScrollEndNotification>(
                       child: Offstage(
-                          offstage:isClosed,
-                          child:widget.child
+                        offstage:false ,
+                        child:widget.child
                       ),
                       onNotification: (ScrollEndNotification notification) {
                         print("滑动结束");
@@ -77,31 +83,40 @@ class _dragStateFul extends State<dragWidget> with TickerProviderStateMixin{
               ),
               decoration: BoxDecoration(
                 borderRadius: BorderRadius.circular(5),
-                gradient: LinearGradient(colors: [Colors.white70, Colors.green]),
+                gradient: LinearGradient(begin:Alignment.topLeft,end:Alignment.bottomRight,colors: [Colors.white70, Colors.green]),
               ),
             )
-
-      ),
+          ),
+          Transform.translate(
+            offset: Offset(0,offsetDistance),
+            child:LoadingWidget(status: loadingStatus,angle: angle,),
+          )
+        ]
     );
   }
 
   void _start(DragStartDetails details){
-    print("手指按下："+details.globalPosition.dx.toString()+",isFinished"+isFinished.toString());
+    angle = 0;
+    print("手指按下：" + details.globalPosition.dx.toString() + ",isFinished" +
+        isFinished.toString());
   }
 
   void _end(DragEndDetails details){
+    if(loadingStatus==STATUS.LOADING){
+      return;
+    }
     print("手指抬起：");
     if(isUp){
-      if(offsetDistance<upThresold){
-        toPosition(y:destinationy);
-      }else{
+      if(offsetDistance<thresold){
         toPosition(y:startPositiony);
+      }else{
+        toPosition(y:destinationy);
       }
     }else{
-      if(offsetDistance>downThresold){
-        toPosition(y:startPositiony);
-      }else{
+      if(offsetDistance>thresold){
         toPosition(y:destinationy);
+      }else{
+        toPosition(y:startPositiony);
       }
     }
   }
@@ -118,30 +133,37 @@ class _dragStateFul extends State<dragWidget> with TickerProviderStateMixin{
 
   void stateListener(AnimationStatus status){
     if(status==AnimationStatus.completed){
+      angle=0;
       isFinished=true;
 
       setState(() {
-        if(offsetDistance==destinationy)
-          isClosed=false;
-        else if(offsetDistance==startPositiony)
-          isClosed=true;
+        if(offsetDistance==destinationy) {
+          loadingStatus = STATUS.LOADING;
+          doCallback();
+        }else if(offsetDistance==startPositiony) {
+          loadingStatus = STATUS.IDLE;
+        }
       });
     }else{
       isFinished=false;
     }
   }
 
-  bool isUp=true;
   void _update(DragUpdateDetails details){
-
+    if(loadingStatus==STATUS.LOADING){
+      return;
+    }
     offsetDistance=offsetDistance+details.delta.dy;
-    if(offsetDistance<destinationy){
-      offsetDistance=destinationy;
+
+    angle= (1.00*(offsetDistance+startPositiony))/(destinationy-startPositiony)*ratio;
+
+    if(offsetDistance<startPositiony){
+      offsetDistance=startPositiony;
       setState(() { });
       return;
     }
-    if(offsetDistance>startPositiony){
-      offsetDistance=startPositiony;
+    if(offsetDistance>Maxy){
+      offsetDistance=Maxy;
       setState(() { });
       return;
     }
@@ -149,9 +171,26 @@ class _dragStateFul extends State<dragWidget> with TickerProviderStateMixin{
     setState(() { });
     print("正在滑动："+details.delta.dy.toString());
     if(details.delta.dy<0){
+      loadingStatus=STATUS.PUSH_UP;
       isUp=true;
     }else{
+      loadingStatus=STATUS.PULL_DOWN;
       isUp=false;
     }
   }
+
+  void doCallback(){
+    if(widget.callback!=null){
+      Future future = new Future.delayed(Duration(milliseconds:1000),() => widget.callback());
+      future.then((_){
+        toPosition(y:startPositiony);
+        print("刷新结束！");
+      }).catchError((_){
+        toPosition(y:startPositiony);
+        print("刷新出错！");
+      });
+    }
+  }
 }
+
+typedef void Refresh();

@@ -13,6 +13,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_app/animation.dart';
 import 'package:flutter_app/main.dart';
 import 'package:flutter_app/shopcart.dart';
+import 'package:flutter_app/widget/FreshContainer.dart';
+import 'package:flutter_app/widget/LoadingWidget.dart';
+
+import 'eventbusutil.dart';
 
 void main() => runApp(MyApp());
 
@@ -118,15 +122,28 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>  with AutomaticKeep
   /// 页面控制器（`PageController`）组件，页面视图（`PageView`）的控制器。
   PageController _controller = PageController();
 
+  static void _clearAll() {
+    eventBus.fire(new ClearAllEvent(true));
+  }
+
   static List<Widget> _widgetOptions = <Widget>[
     animationHomePage(title: 'Flutter Demo Home Page'),
     MyListView(
         productions:prods
     ),
-    Text(
-      'Index 2: School',
-      style: optionStyle,
-    ),
+    Scaffold(
+      body: Center(
+        child:Align(
+          alignment: Alignment.center,
+          child:FreshContainer(
+            child: MyListView(
+              productions: prods,
+            ),
+            callback:(){ _clearAll();print("测试游戏啊！");},
+          ),
+        )
+      )
+    )
   ];
 
   static const navigationitem=const <BottomNavigationBarItem>[

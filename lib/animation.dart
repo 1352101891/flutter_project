@@ -62,23 +62,23 @@ class _MyHomePageState extends State<animationHomePage> with AutomaticKeepAliveC
     // than having to individually change instances of widgets.
     return Scaffold(
       body: Center(
-          child:Align(
-            alignment: Alignment.bottomCenter,
-            child: dragWidget(
-              child:ListView(
-                children: <Widget>[]..addAll(prods.map((f)=>
-                    ListTile(
-                      onTap:()=>showTip(context,f.name),
-                      title: Text(f.name),
-                      subtitle: Text(f.price),
-                      leading: new CircleAvatar(
-                        child: Icon(f.icon),
-                      ),
-                      trailing: new Icon(Icons.add),
-                    )).toList()),
-              )
+        child:Align(
+          alignment: Alignment.bottomCenter,
+          child: dragWidget(
+            child:ListView(
+              children: <Widget>[]..addAll(prods.map((f)=>
+                  ListTile(
+                    onTap:()=>showTip(context,f.name),
+                    title: Text(f.name),
+                    subtitle: Text(f.price),
+                    leading: new CircleAvatar(
+                      child: Icon(f.icon),
+                    ),
+                    trailing: new Icon(Icons.add),
+                  )).toList()),
             )
-          ),
+          )
+        ),
       )
     );
   }
