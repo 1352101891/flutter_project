@@ -5,7 +5,6 @@ part 'BannerModel.g.dart';
 
 ///这个标注是告诉生成器，这个类是需要生成Model类的
 @JsonSerializable()
-
 class BannerModel{
   int id;
   String desc;
