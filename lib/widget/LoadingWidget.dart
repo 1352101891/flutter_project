@@ -78,7 +78,7 @@ class _LoadingStateFul extends State<LoadingWidget> with TickerProviderStateMixi
 
     // TODO: implement build
     return  Container(
-        padding: EdgeInsets.fromLTRB(0,10,0,10),
+        padding: EdgeInsets.fromLTRB(0,0,0,10),
         width: width,
         height: height,
         child: rotateChild,

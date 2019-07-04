@@ -5,6 +5,15 @@ import '../shopcart.dart';
 
 typedef Callback(Map<String, dynamic> responseData);
 
+//get(getBanner,
+//  (map){
+//    map["data"].forEach((item){
+//      var bm = new BannerModel.fromJson(item);
+//      banners.add(bm);
+//    });
+//    setState(() {isloading=false; });
+//  }
+//);
 
 //get(dynamic url, { Map<String, String> headers }) → Future<Response>
 //(必须)url:请求地址

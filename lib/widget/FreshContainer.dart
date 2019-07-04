@@ -5,15 +5,16 @@ import 'LoadingWidget.dart';
 
 class FreshContainer extends StatefulWidget{
   Widget child;
-  Refresh callback;
-  FreshContainer({this.child,this.callback});
+  Refresh refresh;
+  LoadMore loadMore;
+  FreshContainer({this.child,this.refresh,this.loadMore});
 
   @override
   _dragStateFul createState() => _dragStateFul();
 }
 
 class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
-  double offsetDistance =-50;
+  double offsetDistance =-60;
   double destinationy=50;
   double Maxy=70;
   double thresold=35;
@@ -25,6 +26,12 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
   double angle=0;
   int ratio=3; //从起点到终点，一共转几圈
 
+  double upoffset=0;
+  double upthresold=-50;
+  double upangle=0;
+  bool isLoadingMore=false;
+  STATUS uploadStatus=STATUS.IDLE;
+
   _dragStateFul(){
     startPositiony=offsetDistance;
   }
@@ -34,7 +41,11 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
       offsetDistance = update;
     });
   }
-
+  void upsetUpdate(double update){
+    setState(() {
+      upoffset = update;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -42,54 +53,67 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
     return Stack(
         alignment:  Alignment.topCenter,
         children: [
-          GestureDetector(
-            onVerticalDragStart: _start,
-            onVerticalDragEnd: _end,
-            onVerticalDragUpdate: _update,
-            child:  Container(
-              padding: EdgeInsets.fromLTRB(0,10,0,0),
-              width: double.infinity,
-              height: double.infinity,
-              child:NotificationListener<ScrollEndNotification>(
-                child:NotificationListener<ScrollUpdateNotification>(
-                  child: NotificationListener<OverscrollNotification>(
-                    child: NotificationListener<ScrollEndNotification>(
-                      child: Offstage(
-                        offstage:false ,
-                        child:widget.child
+          Stack(alignment:  Alignment.bottomCenter,
+            children: [Container(
+             alignment: Alignment.bottomCenter,
+              child: LoadingWidget(status:uploadStatus,angle: upangle),
+              height:50,
+              decoration: new BoxDecoration(
+//                color: Color(0xFF4068D1), // 底色
+                shape: BoxShape.rectangle, // 默认值也是矩形
+              )
+          ),
+            Transform.translate(offset: Offset(0, upoffset),
+              child: GestureDetector(
+                onVerticalDragStart: _start,
+                onVerticalDragEnd: _end,
+                onVerticalDragUpdate: _update,
+                child:  Container(
+                  padding: EdgeInsets.fromLTRB(0,0,0,0),
+                  width: double.infinity,
+                  height: double.infinity,
+                  child:NotificationListener<ScrollEndNotification>(
+                    child:NotificationListener<ScrollUpdateNotification>(
+                      child: NotificationListener<OverscrollNotification>(
+                        child: NotificationListener<ScrollEndNotification>(
+                          child: Offstage(
+                            offstage:false ,
+                            child:widget.child
+                          ),
+                          onNotification: (ScrollEndNotification notification) {
+                            print("滑动结束");
+                            return false;
+                          },
+                        ),
+                        onNotification: (OverscrollNotification notification) {
+                          if (notification.dragDetails != null &&
+                              notification.dragDetails.delta != null) {
+                            _update(notification.dragDetails);
+                            print("滑动过头");
+                          }
+                          return false;
+                        },
                       ),
-                      onNotification: (ScrollEndNotification notification) {
-                        print("滑动结束");
+                      onNotification:(ScrollUpdateNotification notification) {
                         return false;
                       },
                     ),
-                    onNotification: (OverscrollNotification notification) {
-                      if (notification.dragDetails != null &&
-                          notification.dragDetails.delta != null) {
-                        _update(notification.dragDetails);
-                        print("滑动过头");
-                      }
+                    onNotification:(ScrollEndNotification notification) {
+                      _end(notification.dragDetails);
                       return false;
                     },
                   ),
-                  onNotification:(ScrollUpdateNotification notification) {
-                    return false;
-                  },
-                ),
-                onNotification:(ScrollEndNotification notification) {
-                  _end(notification.dragDetails);
-                  return false;
-                },
-              ),
-              decoration: BoxDecoration(
-                borderRadius: BorderRadius.circular(5),
-                gradient: LinearGradient(begin:Alignment.topLeft,end:Alignment.bottomRight,colors: [Colors.white70, Colors.green]),
-              ),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(5),
+                    gradient: LinearGradient(begin:Alignment.topCenter,end:Alignment.bottomCenter,colors: [Colors.black12, Colors.white]),
+                  ),
+                )
+              )
             )
-          ),
+          ]),
           Transform.translate(
             offset: Offset(0,offsetDistance),
-            child:LoadingWidget(status: loadingStatus,angle: angle,),
+            child:LoadingWidget(status: loadingStatus,angle: angle),
           )
         ]
     );
@@ -105,7 +129,15 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
     if(loadingStatus==STATUS.LOADING){
       return;
     }
+    if(isLoadingMore){
+      return;
+    }
     print("手指抬起：");
+    if(upoffset>upthresold){
+      loadtoPosition(y: 0);
+    }else if(upoffset<=upthresold && upoffset>=1.5*upthresold){
+      loadtoPosition(y: upthresold);
+    }
     if(isUp){
       if(offsetDistance<thresold){
         toPosition(y:startPositiony);
@@ -119,6 +151,16 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
         toPosition(y:startPositiony);
       }
     }
+  }
+
+  void loadtoPosition({double y}){
+    double currentY=upoffset;
+    AnimationController controller=new AnimationController(vsync: this,duration:Duration(milliseconds:duratime));
+    CurvedAnimation curvedAnimation=new CurvedAnimation(parent: controller, curve: Curves.easeIn);
+    Animation<double> animation=new Tween(begin:currentY,end:y).animate(curvedAnimation);
+    animation.addListener(()=>{upsetUpdate(animation.value)});
+    animation.addStatusListener(stateListener);
+    controller.forward();
   }
 
   void toPosition({double x,double y}){
@@ -137,9 +179,13 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
       isFinished=true;
 
       setState(() {
+        if(upoffset==upthresold){
+          uploadStatus=STATUS.LOADING;
+          doLoadMore();
+        }
         if(offsetDistance==destinationy) {
           loadingStatus = STATUS.LOADING;
-          doCallback();
+          doFresh();
         }else if(offsetDistance==startPositiony) {
           loadingStatus = STATUS.IDLE;
         }
@@ -150,7 +196,12 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
   }
 
   void _update(DragUpdateDetails details){
+    print("正在overScroll滑动："+details.delta.dy.toString());
+
     if(loadingStatus==STATUS.LOADING){
+      return;
+    }
+    if(isLoadingMore){
       return;
     }
     offsetDistance=offsetDistance+details.delta.dy;
@@ -159,7 +210,18 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
 
     if(offsetDistance<startPositiony){
       offsetDistance=startPositiony;
-      setState(() { });
+      upoffset=upoffset+details.delta.dy;
+      if(details.delta.dy<0){
+        uploadStatus=STATUS.PUSH_UP;
+      }else{
+        uploadStatus=STATUS.PULL_DOWN;
+      }
+      if(upoffset<upthresold*1.5){
+        upoffset=upthresold*1.5;
+      }else{
+        upangle= (1.00*(upoffset))/(upthresold*1.5)*ratio;
+        setState(() { });
+      }
       return;
     }
     if(offsetDistance>Maxy){
@@ -169,7 +231,7 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
     }
 
     setState(() { });
-    print("正在滑动："+details.delta.dy.toString());
+
     if(details.delta.dy<0){
       loadingStatus=STATUS.PUSH_UP;
       isUp=true;
@@ -179,9 +241,9 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
     }
   }
 
-  void doCallback(){
-    if(widget.callback!=null){
-      Future future = new Future.delayed(Duration(milliseconds:1000),() => widget.callback());
+  void doFresh(){
+    if(widget.refresh!=null){
+      Future future = new Future.delayed(Duration(milliseconds:1000),() => widget.refresh());
       future.then((_){
         toPosition(y:startPositiony);
         print("刷新结束！");
@@ -191,6 +253,23 @@ class _dragStateFul extends State<FreshContainer> with TickerProviderStateMixin{
       });
     }
   }
+
+  void doLoadMore(){
+    isLoadingMore=true;
+    if(widget.loadMore!=null){
+      Future future = new Future.delayed(Duration(milliseconds:1000),() => widget.loadMore());
+      future.then((_){
+        loadtoPosition(y:0);
+        print("加载更多结束！");
+        isLoadingMore=false;
+      }).catchError((_){
+        loadtoPosition(y:0);
+        print("加载更多出错！");
+        isLoadingMore=false;
+      });
+    }
+  }
 }
 
 typedef void Refresh();
+typedef void LoadMore();

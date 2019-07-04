@@ -13,11 +13,11 @@ String author;
 int chapterId;
 String chapterName;
 bool collect;
-String courseId;
+int courseId;
 String desc;
 String envelopePic;
 bool fresh;
-String id;
+int id;
 String link;
 String niceDate;
 String origin;
@@ -43,28 +43,3 @@ PaperModel(this.apkLink, this.author, this.chapterId, this.chapterName,
 factory PaperModel.fromJson(Map<String, dynamic> json) => _$PaperModelFromJson(json);
 Map<String, dynamic> toJson() => _$PaperModelToJson(this);
 }
-
-//"apkLink": "",
-//"author": "三好码农",
-//"chapterId": 313,
-//"chapterName": "字节码",
-//"collect": false,
-//"courseId": 13,
-//"desc": "",
-//"envelopePic": "",
-//"fresh": false,
-//"id": 8635,
-//"link": "https://juejin.im/post/5d0fa403f265da1bb67a2335",
-//"niceDate": "2019-06-24",
-//"origin": "",
-//"prefix": "",
-//"projectLink": "",
-//"publishTime": 1561372474000,
-//"superChapterId": 245,
-//"superChapterName": "Java深入",
-//"tags": [],
-//"title": "重学Java-一个Java对象到底占多少内存",
-//"type": 0,
-//"userId": -1,
-//"visible": 1,
-//"zan": 0

@@ -12,6 +12,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_app/animation.dart';
 import 'package:flutter_app/main.dart';
+import 'package:flutter_app/page/HomeTabView.dart';
 import 'package:flutter_app/shopcart.dart';
 import 'package:flutter_app/widget/FreshContainer.dart';
 import 'package:flutter_app/widget/LoadingWidget.dart';
@@ -127,7 +128,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>  with AutomaticKeep
   }
 
   static List<Widget> _widgetOptions = <Widget>[
-    animationHomePage(title: 'Flutter Demo Home Page'),
+    HomeTabView(),
     MyListView(
         productions:prods
     ),
@@ -139,7 +140,7 @@ class _MyStatefulWidgetState extends State<MyStatefulWidget>  with AutomaticKeep
             child: MyListView(
               productions: prods,
             ),
-            callback:(){ _clearAll();print("测试游戏啊！");},
+            refresh:(){ _clearAll();print("测试游戏啊！");},
           ),
         )
       )
